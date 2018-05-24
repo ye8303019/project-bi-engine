@@ -1,0 +1,35 @@
+
+# environment
+ZHIHUIYA_REGION=US
+ZHIHUIYA_RSYSLOG=192.168.3.71:11514
+ZHIHUIYA_ZABBIX=192.168.3.66
+
+#
+# ----------------------------------------
+#    APPLICATION OVERRIDE CONFIG
+# ----------------------------------------
+#
+APP_JAVA_OPTS=-server -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -Xms2G -Xmx2G  -Dcom.sun.management.jmxremote.port=3000 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+#
+#
+log.app.name=project-bi-engine
+# log.app.noStdout
+log.syslog.host=192.168.3.71
+log.syslog.port=11514
+#
+#
+appPort=8080
+mgtPort=8081
+
+# SENTRY
+SENTRY_DSN=http://3092dcec0c43403e9d43fa8e4e2365f4:78355f63a28d487db84ebba6f5e304cb@sentry.patsnap.local/41
+
+# Dynamodb Config
+configs.com.patsnap.data.dynamodb.credentials.uri=http://192.168.200.101:10500
+
+# Dynamodb Config
+configs.com.patsnap.data.dynamodb.second.credentials.uri=http://192.168.200.101:10500
+
+# Redis Config
+configs.com.patsnap.redis.redisson.single-server-config.address=192.168.200.101:6379
+

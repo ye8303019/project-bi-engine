@@ -1,0 +1,8 @@
+project-bi-engine:
+  image: local-dtr.zhihuiya.com/platform/project-bi-engine-service:Dev.1.0.0-SNAPSHOT
+  ports:
+   - "10001:8080"
+  volumes:
+   - ./logs:/opt/logs
+  env_file: env
+  restart: always

@@ -1,0 +1,42 @@
+image: local-dtr.zhihuiya.com/buildenv/maven3:rel.1.1.0
+
+default: build
+
+working_dir: $PWD
+# entrypoint: /bin/bash
+stdin_open: True
+tty: True
+mem_limit: 1000000000
+privileged: True
+
+environment:
+  - BUILD_REVERSION=$GIT_COMMIT
+  - BUILD_NUMBER=$BUILD_NUMBER
+  - JAVA_OPTS="-XX:MaxPermSize=512m -Xms1024m -Xmx1024m"
+  - DYNAMODB_URI=http://dynamodb:10500
+
+volumes:
+  - ~/.docker/config.json:/root/.docker/config.json
+  - /var/run/docker.sock:/var/run/docker.sock
+  - ~/.m2/repository:/opt/apps/maven3/repo
+
+extra_hosts:
+  - "nexus.patsnap.com:192.168.3.72"
+
+targets:
+  build:
+    links:
+      dynamodb:
+        image: local-dtr.zhihuiya.com/buildenv/dynamodb:rel.1.1.0
+        entrypoint: ["java", "-Djava.library.path=.", "-jar", "DynamoDBLocal.jar", "-inMemory", "-sharedDb"]
+        command: -port 10500
+        expose:
+          - "10500"
+    run: sh ./build.sh build
+
+  publish:
+    before:
+      - build
+    run: sh ./build.sh publish
+
+

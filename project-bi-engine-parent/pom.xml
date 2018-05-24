@@ -1,0 +1,189 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.patsnap.common</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <!-- todo update to latest verison -->
+        <!-- ref https://confluence.zhihuiya.com/display/PS/User%27s+Manual#User'sManual-inuse(springboot1.5.9.RELEASE)-->
+        <version>Dev.1.7.3-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.patsnap.insights</groupId>
+    <artifactId>project-bi-engine-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>PatSnap :: project-bi-engine :: Parent</name>
+
+    <properties>
+        <app.build.branch>master</app.build.branch>
+        <app.build.reversion>UNKNOWN</app.build.reversion>
+        <app.build.number>UNKNOWN</app.build.number>
+        <app.build.date>UNKNOWN</app.build.date>
+    </properties>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.patsnap.insights</groupId>
+                <artifactId>project-bi-engine-api</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.patsnap.insights</groupId>
+                <artifactId>project-bi-engine-core</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.patsnap.insights</groupId>
+                <artifactId>project-bi-engine-service</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <dynamodb.uri>http://localhost:10500</dynamodb.uri>
+                <redis.host>localhost:6379</redis.host>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>cq</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.patsnap.common</groupId>
+                                <artifactId>common-build-util</artifactId>
+                                <version>${common.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <configuration>
+                            <rulesets>
+                                <ruleset>pmd/p3c/java/ali-comment.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-concurrent.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-constant.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-exception.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-flowcontrol.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-naming.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-oop.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-orm.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-other.xml</ruleset>
+                                <ruleset>pmd/p3c/java/ali-set.xml</ruleset>
+                                <ruleset>pmd/p3c/vm/ali-other.xml</ruleset>
+                            </rulesets>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.alibaba.p3c</groupId>
+                                <artifactId>p3c-pmd</artifactId>
+                                <version>${alibaba.p3c.pmd.verison}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>com.patsnap.common</groupId>
+                                <artifactId>common-build-util</artifactId>
+                                <version>${common.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.patsnap.common</groupId>
+                                <artifactId>common-build-util</artifactId>
+                                <version>${common.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
