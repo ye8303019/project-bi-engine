@@ -4,45 +4,40 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.patsnap.insights</groupId>
-        <artifactId>tricky-data-parent</artifactId>
+        <artifactId>project-bi-engine-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../tricky-data-parent/</relativePath>
+        <relativePath>../project-bi-engine-parent/</relativePath>
     </parent>
 
-    <artifactId>tricky-data-core</artifactId>
+    <artifactId>project-bi-engine-core</artifactId>
     <packaging>jar</packaging>
-    <name>PatSnap :: tricky-data :: Core</name>
+    <name>PatSnap :: project-bi-engine :: CORE</name>
 
     <dependencies>
         <dependency>
             <groupId>com.patsnap.insights</groupId>
-            <artifactId>tricky-data-api</artifactId>
+            <artifactId>project-bi-engine-api</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
-
         <!-- Test Dependency -->
         <dependency>
             <groupId>com.patsnap.common</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

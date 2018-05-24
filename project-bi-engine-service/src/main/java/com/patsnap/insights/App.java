@@ -1,5 +1,6 @@
 package com.patsnap.insights;
 
+
 import com.patsnap.insights.trickydata.manager.ExcelManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
