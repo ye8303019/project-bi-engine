@@ -1,5 +1,5 @@
 package com.patsnap.insights.trickydata.manager;
 
 public abstract class BaseManager {
-    public abstract void generalJsonFile (String data);
+    public abstract boolean generalJsonFile (String name, String data);
 }

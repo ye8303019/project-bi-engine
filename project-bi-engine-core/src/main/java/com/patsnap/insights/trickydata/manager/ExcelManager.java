@@ -1,6 +1,5 @@
 package com.patsnap.insights.trickydata.manager;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.gson.Gson;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -13,11 +12,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,14 +34,74 @@ public class ExcelManager extends BaseManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelManager.class);
 
     @Override
-    public void generalJsonFile(String data) {
+    public boolean generalJsonFile(String name, String data) {
+        Boolean generalResult = false;
+        File file = new File("/Users/caoliang/Downloads/" + name + ".json");
+        if (!file.exists()) {
+            FileInputStream fis = null;
+            InputStreamReader isr = null;
+            BufferedReader br = null;
+            FileOutputStream fos = null;
+            PrintWriter pw = null;
+            try {
+                boolean success = file.createNewFile();
+                if (success) {
+                    File createdFile = new File("/Users/caoliang/Downloads/" + name + ".json");
+                    fis = new FileInputStream(createdFile);
+                    isr = new InputStreamReader(fis);
+                    br = new BufferedReader(isr);
+                    StringBuffer buffer = new StringBuffer();
+                    buffer.append(data);
+                    fos = new FileOutputStream(file);
+                    pw = new PrintWriter(fos);
+                    pw.write(buffer.toString().toCharArray());
+                    pw.flush();
+                    generalResult = true;
+                }
+            } catch (IOException e) {
+                LOGGER.error("########### an io error occoured while create file! ", e);
+            } finally {
+                if (pw != null) {
+                    pw.close();
+                }
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("########### an io error occoured while close fos! ", e);
+                    }
+                }
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("########### an io error occoured while close br! ", e);
+                    }
+                }
+                if (isr != null) {
+                    try {
+                        isr.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("########### an io error occoured while close isr! ", e);
+                    }
+                }
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        LOGGER.warn("########### an io error occoured while close fis! ", e);
+                    }
+                }
+            }
 
+        }
+        return generalResult;
     }
 
     public String readFile() {
         String data = readExcelFile();
-        generalJsonFile(data);
-        return "success" + data;
+        generalJsonFile("20180521101235777", data);
+        return "success";
     }
 
     /**
@@ -60,7 +123,7 @@ public class ExcelManager extends BaseManager {
                 workbook = new XSSFWorkbook(inputStream);
             }
 
-            if(workbook != null){
+            if (workbook != null) {
                 Sheet sheet = workbook.getSheetAt(0);
                 int firstLine = sheet.getFirstRowNum();
                 int lastLine = sheet.getLastRowNum();
@@ -73,16 +136,16 @@ public class ExcelManager extends BaseManager {
                 int lastCellNum = row.getPhysicalNumberOfCells();
 
                 LinkedHashMap<String, String> map = null;
-                for(int rowNum = firstLine;rowNum <= lastLine;rowNum++){
+                for (int rowNum = firstLine; rowNum <= lastLine; rowNum++) {
                     map = new LinkedHashMap<>();
-                    for (int index = firstCellNum; index <= lastCellNum; index++){
+                    for (int index = firstCellNum; index <= lastCellNum; index++) {
                         if (rowNum == firstLine) {
-                            if (sheet.getRow(rowNum).getCell(index) != null){
+                            if (sheet.getRow(rowNum).getCell(index) != null) {
                                 titleMap.put(index + "", sheet.getRow(rowNum).getCell(index).getStringCellValue());
                             }
-                        }else{
-                            if (sheet.getRow(rowNum).getCell(index) != null){
-                                switch (sheet.getRow(rowNum).getCell(index).getCellType()){
+                        } else {
+                            if (sheet.getRow(rowNum).getCell(index) != null) {
+                                switch (sheet.getRow(rowNum).getCell(index).getCellType()) {
                                     case Cell.CELL_TYPE_BLANK:
                                         map.put(titleMap.get(index + ""), "");
                                         break;
