@@ -53,7 +53,10 @@ public class ExcelManager extends BaseManager {
 
     public String generalJsonFile(String fileName, InputStream inputStream) {
         List<LinkedHashMap<String, String>> result = readExcelFile(fileName, inputStream);
-        List<String> strList = result.stream().map(e -> e.put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        List<String> strList = result.stream().map(e -> {
+            e.put("id", UUID.randomUUID().toString());
+            return Jackson.toJsonString(e);
+        }).collect(Collectors.toList());
         String data = StringUtils.join(strList, "");
 
         String trimFileName = FilenameUtils.removeExtension(fileName);

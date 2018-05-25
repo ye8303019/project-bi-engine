@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -118,7 +119,10 @@ public class DataCollectionManager {
         //get data & upload
         List<Map<String, Object>> queryedData = redshiftDao.getData(request.getQuery());
 
-        List<String> strList = queryedData.stream().map(e -> e.put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        List<String> strList = queryedData.stream().map(e -> {
+            e.put("id", UUID.randomUUID().toString());
+            return Jackson.toJsonString(e);
+        }).collect(Collectors.toList());
         String jsonString = StringUtils.join(strList, "");
 
         String s3Key = s3Manager.putObject(request.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
@@ -217,9 +221,9 @@ public class DataCollectionManager {
 
         List numbericValue = value.stream().filter(o -> StringUtils.isNumeric(o.toString())).collect(Collectors.toList());
         if (numbericValue.size() * 2 > size) {
-            Map<Integer, Integer> distanceMap = new HashMap<>();
+            Map<String, Integer> distanceMap = new HashMap<>();
             for (int i = 1; i < numbericValue.size(); i++) {
-                Integer distance = Integer.valueOf(numbericValue.get(i).toString()) - Integer.valueOf(numbericValue.get(i - 1).toString());
+                String distance = (new BigDecimal(numbericValue.get(i).toString())).subtract(new BigDecimal(numbericValue.get(i - 1).toString())).toString();
                 if (distanceMap.get(distance) == null) {
                     distanceMap.put(distance, 1);
                 } else {
@@ -227,17 +231,12 @@ public class DataCollectionManager {
                 }
             }
 
-            for (Map.Entry<Integer, Integer> entry : distanceMap.entrySet()) {
+            for (Map.Entry<String, Integer> entry : distanceMap.entrySet()) {
                 if (entry.getValue().intValue() * 2 >=  numbericValue.size()) {
                     return BiType.DIMESION;
                 }
             }
         }
-
-
-
         return BiType.MEASUREMENT;
     }
-
-
 }

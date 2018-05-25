@@ -47,7 +47,10 @@ public class ApiManager extends BaseManager {
 
     public String generalJsonFile(ApiRequest apiRequest) {
         List<Object> jsonObject = getJsonFromApi(apiRequest.getUrl());
-        List<String> strList = jsonObject.stream().map(e -> ((Map)e).put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        List<String> strList = jsonObject.stream().map(e -> {
+            ((Map)e).put("id", UUID.randomUUID().toString());
+            return Jackson.toJsonString(e);
+        }).collect(Collectors.toList());
         String jsonString = StringUtils.join(strList, "");
 
         JsonObject jsonObject1 = (JsonObject) new Gson().toJsonTree(jsonObject.get(0));

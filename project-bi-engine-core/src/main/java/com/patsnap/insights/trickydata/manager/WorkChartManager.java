@@ -52,7 +52,9 @@ public class WorkChartManager {
                     .append(StringUtils.join(measurements, ","))
                     .append(" from \"")
                     .append(dataCollectionEntity.getRemoteTableName())
-                    .append("\"");
+                    .append("\" order by ")
+                    .append(demensions.get(0))
+                    .append(" asc");
             List<Map<String, Object>> data = redshiftDao.getData(sb.toString());
             if (!CollectionUtils.isEmpty(data)){
                 Map<String,List<String>> result = new HashMap<>();
