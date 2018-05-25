@@ -13,7 +13,19 @@
     <packaging>jar</packaging>
     <name>PatSnap :: project-bi-engine :: CORE</name>
 
+    <repositories>
+        <repository>
+            <id>redshift</id>
+            <url>http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>com.amazon.redshift</groupId>
+            <artifactId>redshift-jdbc42</artifactId>
+            <version>1.2.10.1009</version>
+        </dependency>
         <dependency>
             <groupId>com.patsnap.insights</groupId>
             <artifactId>project-bi-engine-api</artifactId>
@@ -60,6 +72,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.11.106</version>
         </dependency>
     </dependencies>
 
