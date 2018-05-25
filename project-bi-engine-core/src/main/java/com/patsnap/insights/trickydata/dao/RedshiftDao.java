@@ -12,11 +12,11 @@ import java.util.Map;
 public class RedshiftDao {
 
     @Autowired
-    //@Qualifier("jdbcRedshift")
+    @Qualifier("jdbcRedshift")
     private JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> getData(String query) {
-        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from 20180525-company");
+        List<Map<String, Object>> list = jdbcTemplate.queryForList("select * from \"20180525-company\"");
         return list;
     }
 
