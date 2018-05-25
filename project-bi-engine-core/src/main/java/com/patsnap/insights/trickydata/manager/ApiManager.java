@@ -12,6 +12,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ApiManager extends BaseManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataTableManager.class);
     @Autowired
     S3Manager s3Manager;
     @Autowired
@@ -70,8 +73,10 @@ public class ApiManager extends BaseManager {
     }
 
     private List<Object> getJsonFromApi(String url) {
+        LOGGER.info("Get json file from api begin");
         RestTemplate restTemplate = new RestTemplate();
         List<Object> response = restTemplate.getForObject("http://127.0.0.1:3000", ArrayList.class);
+        LOGGER.info("Get json file from api end");
 
         return response;
     }
