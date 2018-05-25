@@ -59,6 +59,7 @@ public class ExcelManager extends BaseManager {
         String trimFileName = FilenameUtils.removeExtension(fileName);
         String s3Key = s3Manager.putObject(trimFileName, MediaType.JSON_UTF_8, data.getBytes());
         Set<String> keySet = result.get(0).keySet();
+        keySet.remove("id");
         String schema = StringUtils.join(keySet, " VARCHAR(100) NOT NULL, ");
         schema = "CREATE TABLE \"" + s3Key + "\" (id VARCHAR(100) NOT NULL primary key," + schema + " VARCHAR(100) NOT NULL);";
         redshiftDao.createTable(schema);

@@ -123,6 +123,7 @@ public class DataCollectionManager {
 
         String s3Key = s3Manager.putObject(request.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
         Set<String> keySet = queryedData.get(0).keySet();
+        keySet.remove("id");
         String schema = StringUtils.join(keySet, " VARCHAR(100) NOT NULL, ");
         schema = "CREATE TABLE \"" + s3Key + "\" (id VARCHAR(100) NOT NULL primary key, " + schema + " VARCHAR(100) NOT NULL);";
         redshiftDao.createTable(schema);

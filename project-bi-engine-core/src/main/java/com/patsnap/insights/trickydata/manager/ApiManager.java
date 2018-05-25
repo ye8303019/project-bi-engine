@@ -54,6 +54,8 @@ public class ApiManager extends BaseManager {
 
         List<String> titles = jsonObject1.entrySet().stream().map(e -> e.getKey()).collect(Collectors.toList());
 
+        titles.remove("id");
+
         String s3Key = s3Manager.putObject(apiRequest.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
 
         String schema = StringUtils.join(titles, " VARCHAR(100) NOT NULL, ");
