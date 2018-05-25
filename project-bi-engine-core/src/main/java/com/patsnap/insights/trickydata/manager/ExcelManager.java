@@ -3,6 +3,9 @@ package com.patsnap.insights.trickydata.manager;
 import com.google.common.net.MediaType;
 import com.google.gson.Gson;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -34,9 +37,8 @@ public class ExcelManager extends BaseManager {
 
     public String generalJsonFile(String fileName, InputStream inputStream) {
         String data = readExcelFile(fileName, inputStream);
-
-
-        String s3Key = s3Manager.putObject(fileName, MediaType.OOXML_SHEET, data.getBytes());
+        String trimFileName = FilenameUtils.removeExtension(fileName);
+        String s3Key = s3Manager.putObject(trimFileName + ".json", MediaType.JSON_UTF_8, data.getBytes());
 
         return s3Key;
     }

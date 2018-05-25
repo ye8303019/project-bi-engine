@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,8 +51,8 @@ public class App {
     }
 
     @PostMapping(value = "/api")
-    public String apiResource(@RequestParam("url") String url) {
-        return apiManager.generalJsonFile(url);
+    public String apiResource(@RequestParam("url") String url, @RequestParam("name") String name) {
+        return apiManager.generalJsonFile(url, name);
     }
 
 

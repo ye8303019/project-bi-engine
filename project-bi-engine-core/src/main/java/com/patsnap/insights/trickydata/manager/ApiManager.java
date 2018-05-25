@@ -1,9 +1,16 @@
 package com.patsnap.insights.trickydata.manager;
 
+import com.patsnap.insights.trickydata.entrydata.YearNumberEntity;
+
+import com.amazonaws.util.json.Jackson;
 import com.google.common.net.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description:
@@ -17,10 +24,10 @@ public class ApiManager extends BaseManager {
     @Autowired
     RedShiftFactory redShiftFactory;
 
-    public String generalJsonFile(String url) {
-        String fileName = "";
-        String jsonString = getJsonFromApi(url);
-        String s3Key = s3Manager.putObject(fileName, MediaType.OOXML_SHEET, jsonString.getBytes());
+    public String generalJsonFile(String url, String fileName) {
+        List<YearNumberEntity> jsonObject = getJsonFromApi(url);
+        String jsonString = Jackson.toJsonString(jsonObject);
+        String s3Key = s3Manager.putObject(fileName + ".json", MediaType.JSON_UTF_8, jsonString.getBytes());
 
         return s3Key;
     }
@@ -29,7 +36,10 @@ public class ApiManager extends BaseManager {
         redShiftFactory.getInstance();
     }
 
-    private String getJsonFromApi(String url) {
-        return null;
+    private List<YearNumberEntity> getJsonFromApi(String url) {
+        RestTemplate restTemplate = new RestTemplate();
+        List<YearNumberEntity> response = restTemplate.getForObject("http://127.0.0.1:3000", ArrayList.class);
+
+        return response;
     }
 }
