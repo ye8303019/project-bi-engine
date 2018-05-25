@@ -28,7 +28,7 @@ public class DataCollectionEnpointImpl implements DataCollectionEnpoint{
     private DataCollectionManager dataCollectionManager;
 
 
-    @GetMapping()
+    @GetMapping(value = "/list")
     @Override
     public DataCollectionListResponse getDataCollections() {
         DataCollectionListResponse response = dataCollectionManager.getDataCollectionsByUserId(1);
@@ -45,7 +45,7 @@ public class DataCollectionEnpointImpl implements DataCollectionEnpoint{
     @PutMapping
     @Override
     public DataCollectionResponse updateDataCollection(@RequestBody DataCollectionRequest request) {
-        DataCollectionResponse response = dataCollectionManager.updataCollection(request);
+        DataCollectionResponse response = dataCollectionManager.updateCollection(request);
         return response;
     }
 

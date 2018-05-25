@@ -2,7 +2,6 @@ package com.patsnap.insights.trickydata.endpoint.vo;
 
 import com.patsnap.common.entity.EntityObject;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ public class WorkChartVo extends EntityObject {
 
     private String options;
 
-    private List<Map<String, List<String>>> data;
+    private Map<String, List<String>> data;
 
     public String getId() {
         return id;
@@ -62,11 +61,11 @@ public class WorkChartVo extends EntityObject {
         this.options = options;
     }
 
-    public List<Map<String, List<String>>> getData() {
+    public Map<String, List<String>> getData() {
         return data;
     }
 
-    public void setData(List<Map<String, List<String>>> data) {
+    public void setData(Map<String, List<String>> data) {
         this.data = data;
     }
 }
