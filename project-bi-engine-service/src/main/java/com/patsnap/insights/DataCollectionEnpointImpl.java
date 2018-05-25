@@ -66,6 +66,4 @@ public class DataCollectionEnpointImpl implements DataCollectionEnpoint{
         DataCollectionResponse response = dataCollectionManager.createCollection(request);
         return response;
     }
-
-
 }

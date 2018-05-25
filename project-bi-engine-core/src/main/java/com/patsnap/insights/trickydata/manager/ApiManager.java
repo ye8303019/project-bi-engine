@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +44,7 @@ public class ApiManager extends BaseManager {
 
     public String generalJsonFile(ApiRequest apiRequest) {
         List<Object> jsonObject = getJsonFromApi(apiRequest.getUrl());
-        List<String> strList = jsonObject.stream().map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        List<String> strList = jsonObject.stream().map(e -> ((Map)e).put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
         String jsonString = StringUtils.join(strList, "");
 
         JsonObject jsonObject1 = (JsonObject) new Gson().toJsonTree(jsonObject.get(0));
@@ -52,7 +54,7 @@ public class ApiManager extends BaseManager {
         String s3Key = s3Manager.putObject(apiRequest.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
 
         String schema = StringUtils.join(titles, " VARCHAR(100) NOT NULL, ");
-        schema = "CREATE TABLE \"" + s3Key + "\" (" + schema + " VARCHAR(100) NOT NULL);";
+        schema = "CREATE TABLE \"" + s3Key + "\" (id VARCHAR(100) NOT NULL primary key," + schema + " VARCHAR(100) NOT NULL);";
         redshiftDao.createTable(schema);
         redshiftDao.copy(s3Key, s3Key);
 
@@ -71,7 +73,7 @@ public class ApiManager extends BaseManager {
 
     private List<Object> getJsonFromApi(String url) {
         RestTemplate restTemplate = new RestTemplate();
-        List<Object> response = restTemplate.getForObject("http://127.0.0.1:3000", ArrayList.class);
+        List<Object> response = restTemplate.getForObject(url, ArrayList.class);
 
         return response;
     }

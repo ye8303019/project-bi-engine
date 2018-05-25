@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,11 +118,14 @@ public class DataCollectionManager {
         //get data & upload
         List<Map<String, Object>> queryedData = redshiftDao.getData(request.getQuery());
 
-        // save to redshift
-        String jsonString = Jackson.toJsonString(queryedData);
+        List<String> strList = queryedData.stream().map(e -> e.put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        String jsonString = StringUtils.join(strList, "");
 
         String s3Key = s3Manager.putObject(request.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
-
+        Set<String> keySet = queryedData.get(0).keySet();
+        String schema = StringUtils.join(keySet, " VARCHAR(100) NOT NULL, ");
+        schema = "CREATE TABLE \"" + s3Key + "\" (id VARCHAR(100) NOT NULL primary key, " + schema + " VARCHAR(100) NOT NULL);";
+        redshiftDao.createTable(schema);
         redshiftDao.copy(s3Key, s3Key);
 
         List<String> dimensions = Lists.newArrayList();
@@ -147,7 +153,7 @@ public class DataCollectionManager {
         entity.setMeasurements(measurements.isEmpty() ? result.keySet().iterator().next() : StringUtils.join(measurements, ","));
         entity.setName(request.getName());
         entity.setQuery(request.getQuery());
-        entity.setRemoteTableName(request.getName()); // todo table name
+        entity.setRemoteTableName(s3Key); // todo table name
         entity.setTableList(StringUtils.join(request.getTableList(), ","));
         entity.setUserId(ContextHolder.USER_ID);
         entity = dataCollectionDao.save(entity);

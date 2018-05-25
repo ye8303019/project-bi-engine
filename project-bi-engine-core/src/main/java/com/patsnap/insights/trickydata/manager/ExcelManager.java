@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,14 +53,14 @@ public class ExcelManager extends BaseManager {
 
     public String generalJsonFile(String fileName, InputStream inputStream) {
         List<LinkedHashMap<String, String>> result = readExcelFile(fileName, inputStream);
-        List<String> strList = result.stream().map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        List<String> strList = result.stream().map(e -> e.put("id", UUID.randomUUID().toString())).map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
         String data = StringUtils.join(strList, "");
 
         String trimFileName = FilenameUtils.removeExtension(fileName);
         String s3Key = s3Manager.putObject(trimFileName, MediaType.JSON_UTF_8, data.getBytes());
         Set<String> keySet = result.get(0).keySet();
         String schema = StringUtils.join(keySet, " VARCHAR(100) NOT NULL, ");
-        schema = "CREATE TABLE " + s3Key + " (" + schema + " VARCHAR(100) NOT NULL);";
+        schema = "CREATE TABLE \"" + s3Key + "\" (id VARCHAR(100) NOT NULL primary key," + schema + " VARCHAR(100) NOT NULL);";
         redshiftDao.createTable(schema);
         redshiftDao.copy(s3Key, s3Key);
 

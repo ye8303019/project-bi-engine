@@ -50,8 +50,9 @@ public class WorkChartManager {
                     .append(StringUtils.join(demensions, ","))
                     .append(" , ")
                     .append(StringUtils.join(measurements, ","))
-                    .append(" from ")
-                    .append(dataCollectionEntity.getRemoteTableName());
+                    .append(" from \"")
+                    .append(dataCollectionEntity.getRemoteTableName())
+                    .append("\"");
             List<Map<String, Object>> data = redshiftDao.getData(sb.toString());
             if (!CollectionUtils.isEmpty(data)){
                 Map<String,List<String>> result = new HashMap<>();

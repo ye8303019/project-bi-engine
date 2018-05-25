@@ -11,6 +11,8 @@ import com.google.common.net.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +26,7 @@ import java.util.Date;
  */
 @Service
 public class S3Manager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(S3Manager.class);
     private AmazonS3 amazonS3 = S3ClientFactory.getClient();
 
     public String putObject(String fileName, MediaType mediaType, byte[] bytes) {
@@ -37,7 +40,8 @@ public class S3Manager {
             PutObjectRequest putRequest = new PutObjectRequest(S3ClientFactory.BUCKET_NAME, s3Key, bais, metadata);
             amazonS3.putObject(putRequest);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("catch error ", e);
+            throw e;
         }
         return s3Key;
     }
