@@ -1,7 +1,5 @@
 package com.patsnap.insights.trickydata.dao;
 
-import com.patsnap.insights.trickydata.manager.DataTableManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +21,21 @@ public class RedshiftDao {
     private JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> getData(String query) {
+        LOGGER.info("query redshift {}", query);
         List<Map<String, Object>> list = jdbcTemplate.queryForList(query);
+        LOGGER.info("query redshift end");
         return list;
     }
 
     public boolean copy(String tableName, String fileName) {
         try {
-            jdbcTemplate.execute("copy \"" + tableName + "\" from 's3://bi.data/" + fileName + "' \n" +
+            String sql = "copy \"" + tableName + "\" from 's3://bi.data/" + fileName + "' \n" +
                     "credentials 'aws_iam_role=arn:aws:iam::988868554680:role/myRedShiftToS3' \n" +
-                    "json 'auto' region 'us-east-1';");
+                    "json 'auto' region 'us-east-1';";
+
+            LOGGER.info("copy tableName from s3 {}", sql);
+
+            jdbcTemplate.execute(sql);
         } catch (Exception e) {
             LOGGER.error("catch error ", e);
             throw e;
@@ -41,7 +45,9 @@ public class RedshiftDao {
 
 
     public void createTable(String tableSchema) {
+        LOGGER.info("create redshift table {} begin", tableSchema);
         jdbcTemplate.execute(tableSchema);
+        LOGGER.info("create redshift end");
     }
 
 }
