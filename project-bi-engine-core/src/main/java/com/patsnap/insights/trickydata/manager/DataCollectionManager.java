@@ -120,7 +120,7 @@ public class DataCollectionManager {
 
         String s3Key = s3Manager.putObject(request.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
 
-        redshiftDao.copy(s3Key);
+        redshiftDao.copy(s3Key, s3Key);
 
         List<String> dimensions = Lists.newArrayList();
         List<String> measurements = Lists.newArrayList();

@@ -2,6 +2,7 @@ package com.patsnap.insights;
 
 
 import com.patsnap.insights.trickydata.dao.RedshiftDao;
+import com.patsnap.insights.trickydata.endpoint.request.ApiRequest;
 import com.patsnap.insights.trickydata.manager.ApiManager;
 import com.patsnap.insights.trickydata.manager.ExcelManager;
 
@@ -51,8 +52,8 @@ public class App {
     }
 
     @PostMapping(value = "/api")
-    public String apiResource(@RequestParam("url") String url, @RequestParam("name") String name) {
-        return apiManager.generalJsonFile(url, name);
+    public String apiResource(@RequestBody ApiRequest apiRequest) {
+        return apiManager.generalJsonFile(apiRequest);
     }
 
 

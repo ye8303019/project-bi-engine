@@ -5,10 +5,11 @@ import com.patsnap.insights.trickydata.dao.RedshiftDao;
 import com.patsnap.insights.trickydata.entity.DataSourceEntity;
 import com.patsnap.insights.trickydata.entity.DataTableEntity;
 
+import com.amazonaws.util.json.Jackson;
 import com.google.common.net.MediaType;
-import com.google.gson.Gson;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ExcelManager extends BaseManager {
@@ -48,11 +51,17 @@ public class ExcelManager extends BaseManager {
     DataSourceManager dataSourceManager;
 
     public String generalJsonFile(String fileName, InputStream inputStream) {
-        String data = readExcelFile(fileName, inputStream);
-        String trimFileName = FilenameUtils.removeExtension(fileName);
-        String s3Key = s3Manager.putObject(trimFileName + ".json", MediaType.JSON_UTF_8, data.getBytes());
+        List<LinkedHashMap<String, String>> result = readExcelFile(fileName, inputStream);
+        List<String> strList = result.stream().map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        String data = StringUtils.join(strList, "");
 
-        redshiftDao.copy(s3Key);
+        String trimFileName = FilenameUtils.removeExtension(fileName);
+        String s3Key = s3Manager.putObject(trimFileName, MediaType.JSON_UTF_8, data.getBytes());
+        Set<String> keySet = result.get(0).keySet();
+        String schema = StringUtils.join(keySet, " VARCHAR(100) NOT NULL, ");
+        schema = "CREATE TABLE " + s3Key + " (" + schema + " VARCHAR(100) NOT NULL);";
+        redshiftDao.createTable(schema);
+        redshiftDao.copy(s3Key, s3Key);
 
         DataSourceEntity dataSourceEntity = new DataSourceEntity();
         dataSourceEntity.setName(s3Key);
@@ -73,7 +82,7 @@ public class ExcelManager extends BaseManager {
      *
      * @return
      */
-    private String readExcelFile(String contentType, InputStream inputStream) {
+    private List<LinkedHashMap<String, String>> readExcelFile(String contentType, InputStream inputStream) {
         String data = "";
         List<LinkedHashMap<String, String>> listMaps = new ArrayList<>();
         try {
@@ -137,8 +146,8 @@ public class ExcelManager extends BaseManager {
         } catch (IOException e) {
             LOGGER.error("############ an io error occoured! ", e);
         }
-        data = new Gson().toJson(listMaps);
-        return data;
+        return listMaps;
+
     }
 
 }

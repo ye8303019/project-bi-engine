@@ -10,9 +10,11 @@ import com.amazonaws.services.s3.model.StorageClass;
 import com.google.common.net.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 
 
 /**
@@ -42,8 +44,7 @@ public class S3Manager {
 
     private String generateS3Key(String fileName) {
         StringBuilder builder = new StringBuilder(256);
-        builder.append(UniqueString.uuidUniqueString())
-                .append("/").append(fileName);
+        builder.append(new Date().getTime()).append(fileName);
         return builder.toString();
     }
 }

@@ -1,19 +1,24 @@
 package com.patsnap.insights.trickydata.manager;
 
 import com.patsnap.insights.ContextHolder;
+import com.patsnap.insights.trickydata.dao.RedshiftDao;
+import com.patsnap.insights.trickydata.endpoint.request.ApiRequest;
 import com.patsnap.insights.trickydata.entity.DataSourceEntity;
 import com.patsnap.insights.trickydata.entity.DataTableEntity;
-import com.patsnap.insights.trickydata.entrydata.YearNumberEntity;
 
 import com.amazonaws.util.json.Jackson;
 import com.google.common.net.MediaType;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Description:
@@ -32,10 +37,24 @@ public class ApiManager extends BaseManager {
     @Autowired
     DataSourceManager dataSourceManager;
 
-    public String generalJsonFile(String url, String fileName) {
-        List<YearNumberEntity> jsonObject = getJsonFromApi(url);
-        String jsonString = Jackson.toJsonString(jsonObject);
-        String s3Key = s3Manager.putObject(fileName + ".json", MediaType.JSON_UTF_8, jsonString.getBytes());
+    @Autowired
+    RedshiftDao redshiftDao;
+
+    public String generalJsonFile(ApiRequest apiRequest) {
+        List<Object> jsonObject = getJsonFromApi(apiRequest.getUrl());
+        List<String> strList = jsonObject.stream().map(e -> Jackson.toJsonString(e)).collect(Collectors.toList());
+        String jsonString = StringUtils.join(strList, "");
+
+        JsonObject jsonObject1 = (JsonObject) new Gson().toJsonTree(jsonObject.get(0));
+
+        List<String> titles = jsonObject1.entrySet().stream().map(e -> e.getKey()).collect(Collectors.toList());
+
+        String s3Key = s3Manager.putObject(apiRequest.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
+
+        String schema = StringUtils.join(titles, " VARCHAR(100) NOT NULL, ");
+        schema = "CREATE TABLE \"" + s3Key + "\" (" + schema + " VARCHAR(100) NOT NULL);";
+        redshiftDao.createTable(schema);
+        redshiftDao.copy(s3Key, s3Key);
 
         DataSourceEntity dataSourceEntity = new DataSourceEntity();
         dataSourceEntity.setName(s3Key);
@@ -50,13 +69,9 @@ public class ApiManager extends BaseManager {
         return s3Key;
     }
 
-    public void test() {
-        redShiftFactory.getInstance();
-    }
-
-    private List<YearNumberEntity> getJsonFromApi(String url) {
+    private List<Object> getJsonFromApi(String url) {
         RestTemplate restTemplate = new RestTemplate();
-        List<YearNumberEntity> response = restTemplate.getForObject("http://127.0.0.1:3000", ArrayList.class);
+        List<Object> response = restTemplate.getForObject("http://127.0.0.1:3000", ArrayList.class);
 
         return response;
     }
