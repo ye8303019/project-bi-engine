@@ -6,21 +6,27 @@ import com.patsnap.insights.trickydata.endpoint.request.ApiRequest;
 import com.patsnap.insights.trickydata.manager.ApiManager;
 import com.patsnap.insights.trickydata.manager.ExcelManager;
 
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
 
 /**
  * @author mvn archetype spring boot
@@ -45,10 +51,12 @@ public class App {
         application.run(args);
     }
 
-    @GetMapping(value = "/")
-    public String test() {
-        List<Map<String, Object>> list = redshiftDao.getData("");
-        return "success";
+    @ResponseBody
+    @RequestMapping(value = "/json", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public String test() throws IOException {
+        File file = ResourceUtils.getFile("classpath:data.json");
+        InputStream inputStream = new FileInputStream(file);
+        return IOUtils.toString(inputStream, "UTF-8");
     }
 
     @PostMapping(value = "/api")

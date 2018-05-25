@@ -1,0 +1,42 @@
+[{
+  "year": "1998",
+  "company_number": 10
+},
+
+  {
+    "year": "1999",
+    "company_number": 20
+  },
+  {
+    "year": "2000",
+    "company_number": 30
+  },
+  {
+    "year": "2001",
+    "company_number": 40
+  },
+  {
+    "year": "2002",
+    "company_number": 50
+  },
+  {
+    "year": "2003",
+    "company_number": 60
+  },
+  {
+    "year": "2004",
+    "company_number": 70
+  },
+  {
+    "year": "2005",
+    "company_number": 80
+  },
+  {
+    "year": "2006",
+    "company_number": 90
+  },
+  {
+    "year": "2007",
+    "company_number": 100
+  }
+]
