@@ -3,66 +3,77 @@ package com.patsnap.insights.trickydata.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "chart_conf")
-@IdClass(ChartConfigKey.class)
+@Table(name = "bi_chart")
 public class ChartConfigEntity {
 
     @Id
-    private String name;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-    @Id
-    @Column(name = "dashboard_id")
-    private String dashboardId;
+    @Column(name = "collection_id")
+    private int collectionId;
 
-    @Column(name = "dashboard_source")
-    private String dashboardSource;
+    @Column(name = "user_id")
+    private int userId;
 
-    private String dimension;
+    private String dimensions;
 
-    private String measurement;
+    private String measurements;
 
-    public String getName() {
-        return name;
+    private String options;
+
+    public int getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getDashboardId() {
-        return dashboardId;
+    public int getCollectionId() {
+        return collectionId;
     }
 
-    public void setDashboardId(String dashboardId) {
-        this.dashboardId = dashboardId;
+    public void setCollectionId(int collectionId) {
+        this.collectionId = collectionId;
     }
 
-    public String getDashboardSource() {
-        return dashboardSource;
+    public String getDimensions() {
+        return dimensions;
     }
 
-    public void setDashboardSource(String dashboardSource) {
-        this.dashboardSource = dashboardSource;
+    public void setDimensions(String dimensions) {
+        this.dimensions = dimensions;
     }
 
-    public String getDimension() {
-        return dimension;
+    public String getMeasurements() {
+        return measurements;
     }
 
-    public void setDimension(String dimension) {
-        this.dimension = dimension;
+    public void setMeasurements(String measurements) {
+        this.measurements = measurements;
     }
 
-    public String getMeasurement() {
-        return measurement;
+    public String getOptions() {
+        return options;
     }
 
-    public void setMeasurement(String measurement) {
-        this.measurement = measurement;
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }
