@@ -22,7 +22,7 @@ appPort=8080
 mgtPort=8081
 
 # SENTRY
-SENTRY_DSN=http://3092dcec0c43403e9d43fa8e4e2365f4:78355f63a28d487db84ebba6f5e304cb@sentry.patsnap.local/41
+#SENTRY_DSN=http://3092dcec0c43403e9d43fa8e4e2365f4:78355f63a28d487db84ebba6f5e304cb@sentry.patsnap.local/41
 
 # Dynamodb Config
 configs.com.patsnap.data.dynamodb.credentials.uri=http://192.168.200.101:10500
