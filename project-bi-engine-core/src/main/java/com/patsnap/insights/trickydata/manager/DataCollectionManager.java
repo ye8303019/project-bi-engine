@@ -12,7 +12,9 @@ import com.patsnap.insights.trickydata.entity.DataCollectionEntity;
 import com.patsnap.insights.trickydata.entity.DataTableEntity;
 import com.patsnap.insights.trickydata.type.BiType;
 
+import com.amazonaws.util.json.Jackson;
 import com.google.common.collect.Lists;
+import com.google.common.net.MediaType;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +35,9 @@ public class DataCollectionManager {
 
     @Autowired
     DataCollectionDao dataCollectionDao;
+
+    @Autowired
+    S3Manager s3Manager;
 
     @Autowired
     private DataTableManager dataTableManager;
@@ -109,6 +114,14 @@ public class DataCollectionManager {
 
         //get data & upload
         List<Map<String, Object>> queryedData = redshiftDao.getData(request.getQuery());
+
+        // save to redshift
+        String jsonString = Jackson.toJsonString(queryedData);
+
+        String s3Key = s3Manager.putObject(request.getName(), MediaType.JSON_UTF_8, jsonString.getBytes());
+
+        redshiftDao.copy(s3Key);
+
         List<String> dimensions = Lists.newArrayList();
         List<String> measurements = Lists.newArrayList();
         Map<String, List<Object>> result = new HashMap<>();
@@ -134,7 +147,7 @@ public class DataCollectionManager {
         entity.setMeasurements(measurements.isEmpty() ? result.keySet().iterator().next() : StringUtils.join(measurements, ","));
         entity.setName(request.getName());
         entity.setQuery(request.getQuery());
-        entity.setRemoteTableName(request.getName());
+        entity.setRemoteTableName(request.getName()); // todo table name
         entity.setTableList(StringUtils.join(request.getTableList(), ","));
         entity.setUserId(ContextHolder.USER_ID);
         entity = dataCollectionDao.save(entity);

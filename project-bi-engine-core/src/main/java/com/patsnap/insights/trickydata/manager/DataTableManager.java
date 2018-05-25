@@ -1,20 +1,14 @@
 package com.patsnap.insights.trickydata.manager;
 
-import com.patsnap.insights.trickydata.dao.DataCollectionDao;
 import com.patsnap.insights.trickydata.dao.DataTableDao;
-import com.patsnap.insights.trickydata.entity.DataCollectionEntity;
 import com.patsnap.insights.trickydata.entity.DataTableEntity;
 
-import com.google.common.collect.Lists;
-
-import org.hibernate.annotations.Source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +47,10 @@ public class DataTableManager {
         List<DataTableEntity> list = new ArrayList<>();
         list.forEach(e -> list.add(e));
         return list;
+    }
+
+    public DataTableEntity saveDataTable(DataTableEntity entity) {
+        return dataTableDao.save(entity);
     }
 }
 

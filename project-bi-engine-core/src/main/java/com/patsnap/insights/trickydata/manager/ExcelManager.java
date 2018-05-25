@@ -1,11 +1,14 @@
 package com.patsnap.insights.trickydata.manager;
 
+import com.patsnap.insights.ContextHolder;
+import com.patsnap.insights.trickydata.dao.RedshiftDao;
+import com.patsnap.insights.trickydata.entity.DataSourceEntity;
+import com.patsnap.insights.trickydata.entity.DataTableEntity;
+
 import com.google.common.net.MediaType;
 import com.google.gson.Gson;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -35,10 +38,32 @@ public class ExcelManager extends BaseManager {
     @Autowired
     S3Manager s3Manager;
 
+    @Autowired
+    RedshiftDao redshiftDao;
+
+    @Autowired
+    DataTableManager tableManager;
+
+    @Autowired
+    DataSourceManager dataSourceManager;
+
     public String generalJsonFile(String fileName, InputStream inputStream) {
         String data = readExcelFile(fileName, inputStream);
         String trimFileName = FilenameUtils.removeExtension(fileName);
         String s3Key = s3Manager.putObject(trimFileName + ".json", MediaType.JSON_UTF_8, data.getBytes());
+
+        redshiftDao.copy(s3Key);
+
+        DataSourceEntity dataSourceEntity = new DataSourceEntity();
+        dataSourceEntity.setName(s3Key);
+        dataSourceEntity.setUserId(ContextHolder.USER_ID);
+        dataSourceEntity = dataSourceManager.saveDataSource(dataSourceEntity);
+
+        DataTableEntity dataTableEntity = new DataTableEntity();
+        dataTableEntity.setDatasourceId(dataSourceEntity.getId());
+        // todo check table name
+        dataTableEntity.setName(s3Key);
+        tableManager.saveDataTable(dataTableEntity);
 
         return s3Key;
     }

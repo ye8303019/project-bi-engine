@@ -1,5 +1,8 @@
 package com.patsnap.insights.trickydata.manager;
 
+import com.patsnap.insights.ContextHolder;
+import com.patsnap.insights.trickydata.entity.DataSourceEntity;
+import com.patsnap.insights.trickydata.entity.DataTableEntity;
 import com.patsnap.insights.trickydata.entrydata.YearNumberEntity;
 
 import com.amazonaws.util.json.Jackson;
@@ -23,12 +26,27 @@ public class ApiManager extends BaseManager {
     S3Manager s3Manager;
     @Autowired
     RedShiftFactory redShiftFactory;
+    @Autowired
+    DataTableManager tableManager;
+
+    @Autowired
+    DataSourceManager dataSourceManager;
 
     public String generalJsonFile(String url, String fileName) {
         List<YearNumberEntity> jsonObject = getJsonFromApi(url);
         String jsonString = Jackson.toJsonString(jsonObject);
         String s3Key = s3Manager.putObject(fileName + ".json", MediaType.JSON_UTF_8, jsonString.getBytes());
 
+        DataSourceEntity dataSourceEntity = new DataSourceEntity();
+        dataSourceEntity.setName(s3Key);
+        dataSourceEntity.setUserId(ContextHolder.USER_ID);
+        dataSourceEntity = dataSourceManager.saveDataSource(dataSourceEntity);
+
+        DataTableEntity dataTableEntity = new DataTableEntity();
+        dataTableEntity.setDatasourceId(dataSourceEntity.getId());
+        // todo check table name
+        dataTableEntity.setName(s3Key);
+        tableManager.saveDataTable(dataTableEntity);
         return s3Key;
     }
 
