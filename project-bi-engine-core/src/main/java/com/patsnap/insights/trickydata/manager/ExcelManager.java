@@ -117,7 +117,7 @@ public class ExcelManager extends BaseManager {
                     for (int index = firstCellNum; index <= lastCellNum; index++) {
                         if (rowNum == firstLine) {
                             if (sheet.getRow(rowNum).getCell(index) != null) {
-                                titleMap.put(index + "", sheet.getRow(rowNum).getCell(index).getStringCellValue());
+                                titleMap.put(index + "", sheet.getRow(rowNum).getCell(index).getStringCellValue().toLowerCase());
                             }
                         } else {
                             if (sheet.getRow(rowNum).getCell(index) != null) {
@@ -126,10 +126,20 @@ public class ExcelManager extends BaseManager {
                                         map.put(titleMap.get(index + ""), "");
                                         break;
                                     case Cell.CELL_TYPE_STRING:
-                                        map.put(titleMap.get(index + ""), sheet.getRow(rowNum).getCell(index).getStringCellValue());
+                                        String value = sheet.getRow(rowNum).getCell(index).getStringCellValue();
+                                        if (StringUtils.isNumeric(value) || value.matches("^[0-9]+.0*$")) {
+                                            map.put(titleMap.get(index + ""), new BigDecimal(value.replaceAll("\\.0*", "")).toString());
+                                        }else{
+                                            map.put(titleMap.get(index + ""), value);
+                                        }
                                         break;
                                     case Cell.CELL_TYPE_NUMERIC:
-                                        map.put(titleMap.get(index + ""), BigDecimal.valueOf(sheet.getRow(rowNum).getCell(index).getNumericCellValue()).toPlainString());
+                                        String numberValue = BigDecimal.valueOf(sheet.getRow(rowNum).getCell(index).getNumericCellValue()).toPlainString();
+                                        if (StringUtils.isNumeric(numberValue) || numberValue.matches("^[0-9]+.0*$")) {
+                                            map.put(titleMap.get(index + ""), new BigDecimal(numberValue.replaceAll("\\.0*", "")).toString());
+                                        }else{
+                                            map.put(titleMap.get(index + ""), numberValue);
+                                        }
                                         break;
                                     case Cell.CELL_TYPE_BOOLEAN:
                                         map.put(titleMap.get(index + ""), String.valueOf(sheet.getRow(rowNum).getCell(index).getBooleanCellValue()));

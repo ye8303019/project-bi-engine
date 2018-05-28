@@ -45,7 +45,12 @@ public class WorkChartEndpointImpl implements WorkChartEndpoint {
     @Override
     public WorkChartResponse createWorkChart(@RequestBody WorkChartRequest request) {
         WorkChartResponse response = new WorkChartResponse();
-        ChartConfigEntity entity = new ChartConfigEntity();
+        ChartConfigEntity entity = null;
+        if (StringUtils.isEmpty(request.getId()) || !StringUtils.isNumeric(request.getId())) {
+            entity = new ChartConfigEntity();
+        }else {
+            entity = workChartManager.getChartById(Integer.valueOf(request.getId()));
+        }
         entity.setCollectionId(request.getDataCollectId());
         entity.setDimensions(StringUtils.join(request.getDimensions(), ","));
         entity.setMeasurements(StringUtils.join(request.getMeasurements(), ","));
@@ -57,20 +62,20 @@ public class WorkChartEndpointImpl implements WorkChartEndpoint {
 
     }
 
-    @PutMapping
-    @Override
-    public WorkChartResponse saveWorkChart(@RequestBody WorkChartRequest request) {
-        WorkChartResponse response = new WorkChartResponse();
-        ChartConfigEntity entity = workChartManager.getChartById(request.getId());
-        entity.setCollectionId(request.getDataCollectId());
-        entity.setDimensions(StringUtils.join(request.getDimensions(), ","));
-        entity.setMeasurements(StringUtils.join(request.getMeasurements(), ","));
-        entity.setOptions(request.getOptions());
-        entity.setUserId(ContextHolder.USER_ID);
-        entity = workChartManager.saveChart(entity);
-        response.setData(workChartManager.convertToWorkChartVo(entity, workChartManager.getChartData(entity)));
-        return response;
-    }
+//    @PutMapping
+//    @Override
+//    public WorkChartResponse saveWorkChart(@RequestBody WorkChartRequest request) {
+//        WorkChartResponse response = new WorkChartResponse();
+//        ChartConfigEntity entity = workChartManager.getChartById(request.getId());
+//        entity.setCollectionId(request.getDataCollectId());
+//        entity.setDimensions(StringUtils.join(request.getDimensions(), ","));
+//        entity.setMeasurements(StringUtils.join(request.getMeasurements(), ","));
+//        entity.setOptions(request.getOptions());
+//        entity.setUserId(ContextHolder.USER_ID);
+//        entity = workChartManager.saveChart(entity);
+//        response.setData(workChartManager.convertToWorkChartVo(entity, workChartManager.getChartData(entity)));
+//        return response;
+//    }
 
     @PostMapping(value = "/query")
     @Override

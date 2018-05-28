@@ -10,7 +10,9 @@ public interface WorkChartEndpoint {
 
     public WorkChartResponse createWorkChart(WorkChartRequest request);
 
-    public WorkChartResponse saveWorkChart(WorkChartRequest request);
+//    public WorkChartResponse saveWorkChart(WorkChartRequest request);
 
     public WorkChartResponse queryData(WorkChartRequest request);
+
+//    public WorkChartResponse getWorkChartByChartId();
 }

@@ -6,7 +6,6 @@ import com.patsnap.insights.trickydata.endpoint.request.ApiRequest;
 import com.patsnap.insights.trickydata.manager.ApiManager;
 import com.patsnap.insights.trickydata.manager.ExcelManager;
 
-
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;

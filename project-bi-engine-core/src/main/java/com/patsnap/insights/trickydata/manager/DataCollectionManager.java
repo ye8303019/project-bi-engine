@@ -19,6 +19,8 @@ import com.google.common.net.MediaType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DataCollectionManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataCollectionManager.class);
 
     @Autowired
     DataCollectionDao dataCollectionDao;
@@ -55,27 +58,30 @@ public class DataCollectionManager {
     private List<String> dimesionKey = Lists.newArrayList();
 
     public DataCollectionListResponse getDataCollectionsByUserId(Integer userId) {
+        LOGGER.info("start to get data collection by user id {}", userId);
         DataCollectionListResponse response = new DataCollectionListResponse();
         List<DataCollectionEntity> dataCollectionEntityList = dataCollectionDao.findByUserId(userId);
         if (!CollectionUtils.isEmpty(dataCollectionEntityList)) {
             List<DataCollectionVo> dataCollectionVos = dataCollectionEntityList.stream().map(e -> convertToDataCollectionVo(e)).collect(Collectors.toList());
             response.setData(dataCollectionVos);
         }
-
+        LOGGER.info("end to get data collection by user id {}, data {}.", userId, response.getData());
         return response;
     }
 
     public DataCollectionResponse findDataCollectionsById(Integer id) {
+        LOGGER.info("start to find data collection by id {}", id);
         DataCollectionResponse response = new DataCollectionResponse();
         DataCollectionEntity dataCollectionEntities = dataCollectionDao.findOne(id);
         if (dataCollectionEntities != null) {
             response.setData(convertToDataCollectionVo(dataCollectionEntities));
         }
+        LOGGER.info("end to find data collection by id {}, data {}.", id, response.getData());
         return response;
     }
 
-    //TODO find dimensions and measurements
     public DataCollectionResponse updateCollection(DataCollectionRequest request) {
+        LOGGER.info("start to update data collection {}", request);
         DataCollectionResponse response = new DataCollectionResponse();
         DataCollectionEntity entity = dataCollectionDao.findOne(request.getId());
         if (!entity.getQuery().toLowerCase().equals(request.getQuery().toLowerCase())) {
@@ -108,11 +114,13 @@ public class DataCollectionManager {
         entity.setName(request.getName());
         entity.setTableList(StringUtils.join(request.getTableList(), ","));
         response.setData(convertToDataCollectionVo(dataCollectionDao.save(entity)));
+        LOGGER.info("end to update data collection {}", response.getData());
         return response;
     }
 
     //TODO find dimensions and measurements
     public DataCollectionResponse createCollection(DataCollectionRequest request) {
+        LOGGER.info("start to create data collection {}", request);
         DataCollectionResponse response = new DataCollectionResponse();
         DataCollectionEntity entity = new DataCollectionEntity();
 
@@ -139,10 +147,12 @@ public class DataCollectionManager {
         if (!CollectionUtils.isEmpty(queryedData)) {
             for (Map<String, Object> map : queryedData) {
                 for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    if (null == result.get(entry.getKey())) {
-                        result.put(entry.getKey(), Lists.newArrayList());
+                    if (!entry.getKey().equals("id")) {
+                        if (null == result.get(entry.getKey())) {
+                            result.put(entry.getKey(), Lists.newArrayList());
+                        }
+                        result.get(entry.getKey()).add(entry.getValue());
                     }
-                    result.get(entry.getKey()).add(entry.getValue());
                 }
             }
 
@@ -163,6 +173,7 @@ public class DataCollectionManager {
         entity.setUserId(ContextHolder.USER_ID);
         entity = dataCollectionDao.save(entity);
         response.setData(convertToDataCollectionVo(entity));
+        LOGGER.info("end to create data collection {}", response.getData());
         return response;
     }
 
@@ -173,7 +184,9 @@ public class DataCollectionManager {
         for (Map<String, Object> map : queryedData) {
             dataMap = new LinkedHashMap<>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                dataMap.put(entry.getKey(), entry.getValue().toString());
+                if (!entry.getKey().equals("id")) {
+                    dataMap.put(entry.getKey(), entry.getValue().toString());
+                }
             }
             result.add(dataMap);
         }
